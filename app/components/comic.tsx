@@ -5,7 +5,22 @@ import { motion, useReducedMotion, useTransform, type MotionValue } from "framer
 import type { CSSProperties, ReactNode } from "react";
 
 /* ===============================================================
-   TEXTURAS Y CAPAS DE FONDO
+   TEMAS POR ZONA
+   Cada capítulo tiene marco de viñeta, tipografía y tono propios.
+=============================================================== */
+
+export type Theme = "chalk" | "synth" | "forged" | "hud" | "light";
+
+const PANEL_BASE: Record<Theme, string> = {
+  chalk: "bg-[#0c1a18]/90 text-sky-50/90",
+  synth: "frame-synth bg-[#0e0a0b]/88 text-amber-50/90",
+  forged: "frame-forged bg-[#060b1b]/88 text-slate-100/92",
+  hud: "frame-hud bg-[#04101a]/88 text-cyan-50/90",
+  light: "frame-light bg-[#03140b]/88 text-emerald-50/92",
+};
+
+/* ===============================================================
+   TEXTURAS COMPARTIDAS
 =============================================================== */
 
 export function Halftone({
@@ -59,8 +74,7 @@ export function SpeedLines({ className }: { className?: string }) {
   );
 }
 
-/* Estrellas deterministas: mismas posiciones en servidor y cliente
-   (nada de Math.random, si no React se queja de hidratación). */
+/* Estrellas deterministas: mismas posiciones en servidor y cliente. */
 const STARS = Array.from({ length: 70 }, (_, i) => {
   const a = Math.abs(Math.sin((i + 1) * 12.9898) * 43758.5453) % 1;
   const b = Math.abs(Math.sin((i + 1) * 78.233) * 12345.6789) % 1;
@@ -95,317 +109,371 @@ export function StarField({ className, count = 70 }: { className?: string; count
 }
 
 /* ===============================================================
-   PIEZAS DE CÓMIC
+   ADORNOS DE MARCO (uno por tema)
+=============================================================== */
+
+function ChalkFrame() {
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 400 260"
+      preserveAspectRatio="none"
+      className="pointer-events-none absolute inset-0 h-full w-full"
+    >
+      <defs>
+        <filter id="chalkRough">
+          <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="3" result="ruido" />
+          <feDisplacementMap in="SourceGraphic" in2="ruido" scale="5" />
+        </filter>
+      </defs>
+      <rect
+        x="5"
+        y="5"
+        width="390"
+        height="250"
+        fill="none"
+        stroke="#e8f6ff"
+        strokeWidth="1.6"
+        opacity="0.55"
+        filter="url(#chalkRough)"
+      />
+    </svg>
+  );
+}
+
+function SynthFrame() {
+  return (
+    <>
+      {/* nodos en las esquinas */}
+      {["left-0 top-0", "right-0 top-0", "left-0 bottom-0", "right-0 bottom-0"].map((c, i) => (
+        <span
+          key={i}
+          aria-hidden
+          className={clsx(
+            "pointer-events-none absolute h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#f5b301]",
+            c,
+            i === 1 && "translate-x-1/2",
+            i === 2 && "translate-y-1/2",
+            i === 3 && "translate-x-1/2 translate-y-1/2"
+          )}
+        />
+      ))}
+      {/* costura: la grieta roja rellenada de oro */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-y-6 left-0 w-[2px] bg-[linear-gradient(180deg,#e04b3a,#f5b301,#e04b3a)]"
+      />
+      {/* traza de circuito arriba */}
+      <svg
+        aria-hidden
+        viewBox="0 0 400 12"
+        preserveAspectRatio="none"
+        className="pointer-events-none absolute -top-[1px] left-0 h-3 w-full opacity-70"
+        fill="none"
+      >
+        <path
+          d="M0 6 H120 L132 1 H212 L224 11 H300 L312 6 H400"
+          stroke="#f5b301"
+          strokeWidth="1"
+        />
+      </svg>
+    </>
+  );
+}
+
+function ForgedFrame() {
+  return (
+    <>
+      {["left-2 top-2", "right-2 top-2", "left-2 bottom-2", "right-2 bottom-2"].map((c, i) => (
+        <span
+          key={i}
+          aria-hidden
+          className={clsx(
+            "pointer-events-none absolute h-2.5 w-2.5 rounded-full bg-slate-300/45 shadow-[inset_0_1px_1px_rgba(0,0,0,0.6)]",
+            c
+          )}
+        />
+      ))}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-8 -top-[2px] h-[2px] bg-[linear-gradient(90deg,transparent,#ff2d95,#22d3ee,transparent)]"
+      />
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-8 -bottom-[2px] h-[2px] bg-[linear-gradient(90deg,transparent,#22d3ee,#ff2d95,transparent)]"
+      />
+    </>
+  );
+}
+
+function HudFrame() {
+  return (
+    <>
+      {[
+        "left-0 top-0 border-l-2 border-t-2",
+        "right-0 top-0 border-r-2 border-t-2",
+        "left-0 bottom-0 border-b-2 border-l-2",
+        "right-0 bottom-0 border-b-2 border-r-2",
+      ].map((c, i) => (
+        <span
+          key={i}
+          aria-hidden
+          className={clsx("pointer-events-none absolute h-5 w-5 border-cyan-300/80", c)}
+        />
+      ))}
+      <span
+        aria-hidden
+        className="hud-ticks pointer-events-none absolute inset-x-10 top-[3px] h-[6px] text-cyan-300/30"
+      />
+      <span
+        aria-hidden
+        className="hud-ticks pointer-events-none absolute inset-x-10 bottom-[3px] h-[6px] text-cyan-300/20"
+      />
+      <div aria-hidden className="scanlines pointer-events-none absolute inset-0 opacity-30" />
+    </>
+  );
+}
+
+function LightFrame() {
+  return (
+    <>
+      {[
+        "left-1.5 top-1.5 border-l border-t",
+        "right-1.5 top-1.5 border-r border-t",
+        "left-1.5 bottom-1.5 border-b border-l",
+        "right-1.5 bottom-1.5 border-b border-r",
+      ].map((c, i) => (
+        <span
+          key={i}
+          aria-hidden
+          className={clsx(
+            "pointer-events-none absolute h-6 w-6 border-emerald-200/80 shadow-[0_0_14px_rgba(34,197,94,0.6)]",
+            c
+          )}
+        />
+      ))}
+    </>
+  );
+}
+
+const FRAME_DECOR: Record<Theme, () => ReactNode> = {
+  chalk: ChalkFrame,
+  synth: SynthFrame,
+  forged: ForgedFrame,
+  hud: HudFrame,
+  light: LightFrame,
+};
+
+/* ===============================================================
+   VIÑETA
 =============================================================== */
 
 export function Panel({
+  theme,
   children,
-  variant = "ink",
   className,
 }: {
+  theme: Theme;
   children: ReactNode;
-  variant?: "ink" | "paper";
   className?: string;
 }) {
-  const paper = variant === "paper";
+  const Decor = FRAME_DECOR[theme];
   return (
     <div
       className={clsx(
-        "relative w-full border-2 px-5 py-8 sm:px-9 sm:py-10",
-        paper
-          ? "border-ink bg-[#fffdf6]/95 text-ink shadow-[7px_7px_0_0_var(--accent)]"
-          : "border-white/20 bg-white/[0.035] text-zinc-200 shadow-[0_0_80px_-24px_var(--accent),6px_6px_0_0_rgba(255,255,255,0.05)] backdrop-blur-[2px]",
+        "relative w-full px-5 py-8 backdrop-blur-[3px] sm:px-9 sm:py-10",
+        PANEL_BASE[theme],
         className
       )}
     >
-      <Halftone className={paper ? "text-ink opacity-[0.07]" : "text-white opacity-[0.05]"} />
-      {/* esquinas marcadas de la viñeta */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -left-[3px] -top-[3px] h-5 w-5 border-l-[3px] border-t-[3px]"
-        style={{ borderColor: "var(--accent)" }}
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -bottom-[3px] -right-[3px] h-5 w-5 border-b-[3px] border-r-[3px]"
-        style={{ borderColor: "var(--accent)" }}
-      />
+      <Decor />
       <div className="relative">{children}</div>
     </div>
   );
 }
 
-export function ChapterTag({ number, title }: { number: string; title: string }) {
-  return (
-    <div className="mb-5 flex flex-wrap items-center gap-3">
-      <span
-        className="font-comic px-2.5 py-1 text-xs tracking-[0.25em] text-ink sm:text-sm"
-        style={{ background: "var(--accent)" }}
-      >
-        CAP. {number}
-      </span>
-      <span className="font-comic text-xs uppercase tracking-[0.35em] text-white/55 sm:text-sm">
-        {title}
-      </span>
-    </div>
-  );
-}
-
-export function Sfx({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <motion.span
-      aria-hidden
-      initial={{ opacity: 0, scale: 0.35, rotate: -26 }}
-      whileInView={{ opacity: 1, scale: 1, rotate: -9 }}
-      viewport={{ once: false, amount: 0.4 }}
-      transition={{ type: "spring", stiffness: 240, damping: 13, delay: 0.35 }}
-      className={clsx(
-        "comic-title pointer-events-none select-none text-3xl sm:text-5xl md:text-6xl [--stroke:#0a0a0f]",
-        className
-      )}
-      style={{ color: "var(--accent)" }}
-    >
-      {children}
-    </motion.span>
-  );
-}
-
-export function StarBadge({
-  label,
-  sub,
+/* Viñeta de papel, para la portada y el regalo. */
+export function PaperPanel({
+  children,
   className,
 }: {
-  label: string;
-  sub?: string;
+  children: ReactNode;
   className?: string;
 }) {
-  const points = Array.from({ length: 28 }, (_, i) => {
-    const r = i % 2 === 0 ? 49 : 36;
-    const a = (Math.PI * 2 * i) / 28 - Math.PI / 2;
-    return `${(50 + r * Math.cos(a)).toFixed(2)},${(50 + r * Math.sin(a)).toFixed(2)}`;
-  }).join(" ");
-
   return (
-    <div className={clsx("relative h-24 w-24 sm:h-28 sm:w-28", className)}>
-      <svg viewBox="0 0 100 100" className="h-full w-full drop-shadow-[3px_4px_0_rgba(16,15,13,0.85)]">
-        <polygon points={points} fill="var(--accent)" stroke="#100f0d" strokeWidth="2.5" />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center font-comic leading-none text-ink">
-        <span className="text-2xl sm:text-3xl">{label}</span>
-        {sub ? (
-          <span className="mt-0.5 text-[9px] uppercase tracking-[0.22em] sm:text-[11px]">{sub}</span>
-        ) : null}
-      </div>
+    <div
+      className={clsx(
+        "relative w-full border-2 border-ink bg-[#fffdf6]/95 px-5 py-8 text-ink shadow-[7px_7px_0_0_var(--accent)] sm:px-9 sm:py-10",
+        className
+      )}
+    >
+      <Halftone className="text-ink opacity-[0.07]" />
+      <div className="relative">{children}</div>
     </div>
   );
 }
 
 /* ===============================================================
-   EFECTO VELOCISTA (diseño propio)
-   Estelas con eco, arcos eléctricos y un emblema de rombo + rayo
-   dibujado desde cero.
+   CABECERA DE CAPÍTULO
+   La tipografía cambia con la zona: tiza, monoespaciada, neón...
 =============================================================== */
 
-const BOLTS = [
-  "M120 20 L96 92 L132 86 L104 168",
-  "M470 40 L500 104 L466 106 L494 178",
-  "M300 8 L272 70 L306 66 L286 128",
-];
+function ChapterHeader({
+  number,
+  title,
+  label,
+  theme,
+}: {
+  number: string;
+  title: string;
+  label?: string;
+  theme: Theme;
+}) {
+  if (theme === "chalk") {
+    return (
+      <div className="mb-4 flex w-full flex-wrap items-baseline gap-x-3 gap-y-1">
+        <span className="chalk font-hand text-2xl text-sky-100/90 sm:text-3xl">Cap. {number}</span>
+        <span className="chalk font-hand text-xl text-sky-100/55 sm:text-2xl">— {title}</span>
+        {label ? (
+          <span className="chalk font-hand ml-auto text-lg text-sky-200/50 sm:text-xl">
+            {label}
+          </span>
+        ) : null}
+      </div>
+    );
+  }
 
-export function SpeedsterFx() {
+  if (theme === "synth") {
+    return (
+      <div className="mb-4 flex w-full flex-wrap items-center gap-x-3 gap-y-2">
+        <span className="font-tech border border-[#f5b301]/70 px-2 py-1 text-[10px] tracking-[0.3em] text-[#f5b301] sm:text-xs">
+          CAP.{number}
+        </span>
+        <span
+          className="glitch font-tech text-[10px] uppercase tracking-[0.3em] text-white/70 sm:text-xs"
+          data-text={title}
+        >
+          {title}
+        </span>
+        {label ? (
+          <span className="font-tech ml-auto text-[9px] uppercase tracking-[0.25em] text-white/35 sm:text-[11px]">
+            {label}
+          </span>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (theme === "forged") {
+    return (
+      <div className="mb-4 flex w-full flex-wrap items-baseline gap-x-4 gap-y-1">
+        <span
+          className="neon-text font-comic text-2xl sm:text-3xl"
+          style={{ ["--neon" as string]: "#ff2d95", ["--neon2" as string]: "#22d3ee" }}
+        >
+          CAP. {number}
+        </span>
+        <span className="font-comic text-lg uppercase tracking-[0.25em] text-slate-200/75 sm:text-xl">
+          {title}
+        </span>
+        {label ? (
+          <span
+            className="neon-text font-comic ml-auto text-lg sm:text-xl"
+            style={{ ["--neon" as string]: "#22d3ee", ["--neon2" as string]: "#ff2d95" }}
+          >
+            {label}
+          </span>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (theme === "hud") {
+    return (
+      <div className="mb-4 flex w-full flex-wrap items-center gap-x-3 gap-y-2">
+        <span className="font-tech text-[10px] tracking-[0.25em] text-cyan-300 sm:text-xs">
+          [ CAP.{number} ]
+        </span>
+        <span className="font-tech text-[10px] uppercase tracking-[0.3em] text-white/55 sm:text-xs">
+          {title}
+        </span>
+        <span aria-hidden className="hud-ticks hidden h-2 flex-1 text-cyan-300/30 sm:block" />
+        {label ? (
+          <span className="font-tech text-[9px] uppercase tracking-[0.2em] text-[#f5b301]/80 sm:text-[11px]">
+            {label}
+          </span>
+        ) : null}
+      </div>
+    );
+  }
+
+  /* light */
   return (
-    <>
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(251,191,36,0.12),transparent_62%)]"
-      />
-
-      {/* emblema propio: rombo con rayo */}
-      <motion.svg
-        viewBox="0 0 120 120"
-        className="absolute h-[38vmin] w-[38vmin] max-h-[320px] max-w-[320px] opacity-[0.18]"
-        animate={{ scale: [1, 1.06, 1] }}
-        transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <path d="M60 4 L114 60 L60 116 L6 60 Z" fill="none" stroke="#fbbf24" strokeWidth="3" />
-        <path d="M60 10 L108 60 L60 110 L12 60 Z" fill="none" stroke="#f87171" strokeWidth="1" />
-        <path d="M68 26 L38 64 L57 64 L49 96 L84 56 L63 56 Z" fill="#fbbf24" />
-      </motion.svg>
-
-      {/* estelas con eco */}
-      {[0, 0.11, 0.22].map((delay, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, x: "-120%" }}
-          whileInView={{ opacity: [0, 1, 0], x: "120%" }}
-          viewport={{ once: false, amount: 0.35 }}
-          transition={{ duration: 0.8, delay: 0.35 + delay, ease: "easeOut" }}
-          className="absolute left-0 h-[2px] w-full"
-          style={{
-            top: `${45 + i * 4}%`,
-            background: i === 0 ? "#fde68a" : "#f87171",
-            boxShadow:
-              i === 0
-                ? "0 0 55px 12px rgba(253,230,138,0.5)"
-                : "0 0 40px 8px rgba(248,113,113,0.3)",
-          }}
-        />
-      ))}
-
-      {/* arcos eléctricos */}
-      <svg
-        viewBox="0 0 600 200"
-        className="absolute h-[70vmin] w-[92vmin] opacity-70"
-        fill="none"
-      >
-        {BOLTS.map((d, i) => (
-          <motion.path
-            key={i}
-            d={d}
-            stroke={i === 1 ? "#f87171" : "#fde68a"}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            initial={{ pathLength: 0, opacity: 0 }}
-            whileInView={{ pathLength: [0, 1, 1], opacity: [0, 1, 0] }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{
-              duration: 1.2,
-              delay: 0.6 + i * 0.28,
-              repeat: Infinity,
-              repeatDelay: 2.4,
-              ease: "easeOut",
-            }}
-          />
-        ))}
-      </svg>
-
-      <SpeedLines className="text-amber-200/25" />
-    </>
+    <div className="mb-4 flex w-full flex-wrap items-baseline gap-x-4 gap-y-1">
+      <span className="font-comic text-2xl text-emerald-300 drop-shadow-[0_0_14px_rgba(34,197,94,0.9)] sm:text-3xl">
+        CAP. {number}
+      </span>
+      <span className="font-comic text-lg uppercase tracking-[0.25em] text-emerald-100/70 sm:text-xl">
+        {title}
+      </span>
+      {label ? (
+        <span className="font-comic ml-auto text-lg uppercase tracking-[0.2em] text-emerald-200/60 sm:text-xl">
+          {label}
+        </span>
+      ) : null}
+    </div>
   );
 }
 
 /* ===============================================================
-   EFECTO LINTERNA (diseño propio)
-   Farol hexagonal con núcleo de luz, anillo que se dibuja y
-   partículas subiendo. Todo dibujado desde cero.
+   CAPÍTULO (sección completa)
 =============================================================== */
 
-const MOTES = Array.from({ length: 16 }, (_, i) => {
-  const a = Math.abs(Math.sin((i + 1) * 9.13) * 3571.11) % 1;
-  const b = Math.abs(Math.sin((i + 1) * 5.77) * 1597.31) % 1;
-  return {
-    left: `${(24 + a * 52).toFixed(2)}%`,
-    size: Number((2 + b * 3).toFixed(2)),
-    delay: Number((a * 6).toFixed(2)),
-    dur: Number((6 + b * 5).toFixed(2)),
-    drift: Math.round((a - 0.5) * 60),
-  };
-});
-
-export function LanternFx() {
-  const reduce = useReducedMotion();
+export function Chapter({
+  number,
+  title,
+  label,
+  theme,
+  accent,
+  effect,
+  children,
+  after,
+}: {
+  number: string;
+  title: string;
+  label?: string;
+  theme: Theme;
+  accent: string;
+  effect?: ReactNode;
+  children: ReactNode;
+  after?: ReactNode;
+}) {
   return (
-    <>
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(circle_at_50%_52%,rgba(34,197,94,0.22),transparent_62%)]"
-      />
-      <StarField count={55} className="opacity-70" />
-      <Rays className="h-[130vmin] w-[130vmin] text-emerald-300/10" spin={200} />
-
-      {/* anillos */}
-      <svg viewBox="0 0 200 200" className="absolute h-[76vmin] w-[76vmin]" fill="none">
-        <motion.circle
-          cx="100"
-          cy="100"
-          r="78"
-          stroke="#4ade80"
-          strokeWidth="1"
-          strokeDasharray="3 7"
-          opacity="0.5"
-          style={{ transformOrigin: "100px 100px" }}
-          animate={reduce ? undefined : { rotate: 360 }}
-          transition={{ duration: 70, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.circle
-          cx="100"
-          cy="100"
-          r="62"
-          stroke="#22c55e"
-          strokeWidth="2"
-          initial={{ pathLength: 0, opacity: 0 }}
-          whileInView={{ pathLength: 1, opacity: 0.85 }}
-          viewport={{ once: false, amount: 0.3 }}
-          transition={{ duration: 2.4, ease: "easeInOut", delay: 0.3 }}
-        />
-      </svg>
-
-      {/* el farol */}
-      <motion.svg
-        viewBox="0 0 120 180"
-        className="absolute h-[44vmin] max-h-[330px]"
-        animate={reduce ? undefined : { y: [0, -12, 0] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <defs>
-          <radialGradient id="lanternCore" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#f0fff5" />
-            <stop offset="42%" stopColor="#4ade80" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#14532d" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-
-        {/* resplandor */}
-        <motion.ellipse
-          cx="60"
-          cy="96"
-          rx="52"
-          ry="58"
-          fill="url(#lanternCore)"
-          animate={reduce ? undefined : { opacity: [0.55, 1, 0.55] }}
-          transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-        />
-
-        <g stroke="#08361f" strokeWidth="3" strokeLinejoin="round">
-          {/* asa */}
-          <path d="M38 32 a22 20 0 0 1 44 0" fill="none" />
-          {/* tapa */}
-          <polygon points="60,34 94,52 94,60 26,60 26,52" fill="#1f7a4d" />
-          {/* cuerpo */}
-          <path d="M31 60 L89 60 L84 134 L36 134 Z" fill="#0f5132" fillOpacity="0.85" />
-          {/* base */}
-          <polygon points="26,134 94,134 99,152 21,152" fill="#1f7a4d" />
-        </g>
-
-        {/* núcleo de luz */}
-        <motion.path
-          d="M60 72 C76 92 71 112 60 122 C49 112 44 92 60 72 Z"
-          fill="#dcfce7"
-          animate={reduce ? undefined : { opacity: [0.75, 1, 0.75], scale: [1, 1.05, 1] }}
-          style={{ transformOrigin: "60px 97px" }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-        />
-        {/* barrotes del farol */}
-        <path d="M46 60 L44 134 M74 60 L76 134" stroke="#08361f" strokeWidth="2.5" />
-      </motion.svg>
-
-      {/* partículas de luz subiendo */}
-      {!reduce && (
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          {MOTES.map((m, i) => (
-            <motion.span
-              key={i}
-              style={{ left: m.left, width: m.size, height: m.size }}
-              className="absolute bottom-1/4 rounded-full bg-emerald-200 shadow-[0_0_10px_2px_rgba(74,222,128,0.6)]"
-              initial={{ y: 0, opacity: 0 }}
-              animate={{ y: -320, x: m.drift, opacity: [0, 0.9, 0] }}
-              transition={{ duration: m.dur, delay: m.delay, repeat: Infinity, ease: "easeOut" }}
-            />
-          ))}
+    <section
+      style={{ "--accent": accent } as CSSProperties}
+      className="relative z-10 flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-4 py-24 sm:px-6"
+    >
+      {effect ? (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+        >
+          {effect}
         </div>
-      )}
-    </>
+      ) : null}
+
+      <motion.div
+        initial={{ opacity: 0, y: 44 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: false, amount: 0.2 }}
+        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        className="relative z-10 flex w-full max-w-3xl flex-col items-start"
+      >
+        <ChapterHeader number={number} title={title} label={label} theme={theme} />
+        <Panel theme={theme}>{children}</Panel>
+        {after}
+      </motion.div>
+    </section>
   );
 }
 
@@ -418,7 +486,7 @@ export function ProgressBar({ progress }: { progress: MotionValue<number> }) {
     <div className="fixed inset-x-0 top-0 z-50 h-[3px] bg-white/10">
       <motion.div
         style={{ scaleX: progress }}
-        className="h-full origin-left bg-gradient-to-r from-amber-300 via-rose-500 to-emerald-400"
+        className="h-full origin-left bg-gradient-to-r from-sky-200 via-[#ff2d95] to-emerald-400"
       />
     </div>
   );
@@ -463,58 +531,38 @@ export function ChapterDots({
 }
 
 /* ===============================================================
-   CAPÍTULO (sección completa)
+   SELLO DE ESTRELLA (cierre)
 =============================================================== */
 
-export function Chapter({
-  number,
-  title,
-  sfx,
-  accent,
-  effect,
-  children,
-  after,
+export function StarBadge({
+  label,
+  sub,
+  className,
 }: {
-  number: string;
-  title: string;
-  sfx?: string;
-  accent: string;
-  effect?: ReactNode;
-  children: ReactNode;
-  after?: ReactNode;
+  label: string;
+  sub?: string;
+  className?: string;
 }) {
+  const points = Array.from({ length: 28 }, (_, i) => {
+    const r = i % 2 === 0 ? 49 : 36;
+    const a = (Math.PI * 2 * i) / 28 - Math.PI / 2;
+    return `${(50 + r * Math.cos(a)).toFixed(2)},${(50 + r * Math.sin(a)).toFixed(2)}`;
+  }).join(" ");
+
   return (
-    <section
-      style={{ "--accent": accent } as CSSProperties}
-      className="relative z-10 flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-4 py-24 sm:px-6"
-    >
-      {effect ? (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
-        >
-          {effect}
-        </div>
-      ) : null}
-
-      <motion.div
-        initial={{ opacity: 0, y: 48 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, amount: 0.25 }}
-        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10 flex w-full max-w-3xl flex-col items-start"
+    <div className={clsx("relative h-24 w-24 sm:h-28 sm:w-28", className)}>
+      <svg
+        viewBox="0 0 100 100"
+        className="h-full w-full drop-shadow-[3px_4px_0_rgba(16,15,13,0.85)]"
       >
-        <ChapterTag number={number} title={title} />
-
-        <div className="relative w-full">
-          {sfx ? (
-            <Sfx className="absolute -top-8 right-1 z-20 sm:-right-6 sm:-top-12">{sfx}</Sfx>
-          ) : null}
-          <Panel>{children}</Panel>
-        </div>
-
-        {after}
-      </motion.div>
-    </section>
+        <polygon points={points} fill="var(--accent)" stroke="#100f0d" strokeWidth="2.5" />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center font-comic leading-none text-ink">
+        <span className="text-2xl sm:text-3xl">{label}</span>
+        {sub ? (
+          <span className="mt-0.5 text-[9px] uppercase tracking-[0.22em] sm:text-[11px]">{sub}</span>
+        ) : null}
+      </div>
+    </div>
   );
 }

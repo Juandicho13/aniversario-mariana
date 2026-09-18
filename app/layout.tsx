@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bangers, Caveat, Playfair_Display } from "next/font/google";
+import { Bangers, Caveat, Playfair_Display, Space_Mono } from "next/font/google";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -21,6 +21,13 @@ const caveat = Caveat({
   variable: "--font-caveat",
 });
 
+const spaceMono = Space_Mono({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-space-mono",
+});
+
 export const metadata: Metadata = {
   title: "Para Mariana · Nº 4",
   description: "Feliz 4to aniversario",
@@ -34,7 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="es"
-      className={`${playfair.variable} ${bangers.variable} ${caveat.variable}`}
+      className={`${playfair.variable} ${bangers.variable} ${caveat.variable} ${spaceMono.variable}`}
     >
       <body className="antialiased">{children}</body>
     </html>

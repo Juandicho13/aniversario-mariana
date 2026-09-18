@@ -11,11 +11,12 @@
   --font-comic: var(--font-bangers);
   --font-letter: var(--font-playfair);
   --font-hand: var(--font-caveat);
+  --font-tech: var(--font-space-mono);
 }
 
 :root {
   /* color de acento de la escena actual (lo sobreescribe cada sección) */
-  --accent: #ffd60a;
+  --accent: #9fd8ff;
   color-scheme: dark;
 }
 
@@ -57,8 +58,156 @@ body {
   box-shadow: 0 1px 5px rgba(90, 60, 50, 0.18);
 }
 
+.paper-grain {
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(180, 140, 90, 0.16), transparent 45%),
+    radial-gradient(circle at 82% 72%, rgba(150, 110, 70, 0.14), transparent 50%),
+    radial-gradient(circle at 50% 100%, rgba(120, 90, 60, 0.1), transparent 55%);
+}
+
 /* ---------------------------------------------------------------
-   TRAMA DE PUNTOS (Ben-Day). Se tiñe con text-*, usa currentColor.
+   CAP. 02 · PIZARRA Y VELOCIDAD
+--------------------------------------------------------------- */
+.chalkboard {
+  background-color: #0d1a18;
+  background-image:
+    radial-gradient(ellipse 60% 50% at 25% 28%, rgba(255, 255, 255, 0.045), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 78% 70%, rgba(255, 255, 255, 0.035), transparent 70%);
+}
+
+/* tiza: bordes suaves, como polvo */
+.chalk {
+  text-shadow: 0 0 9px rgba(191, 219, 254, 0.3);
+}
+
+/* ---------------------------------------------------------------
+   CAP. 03 · SINTÉTICO (orden naciendo del caos)
+--------------------------------------------------------------- */
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  pointer-events: none;
+}
+.glitch::before {
+  color: #e04b3a;
+  animation: glitch-a 4s infinite;
+}
+.glitch::after {
+  color: #f5b301;
+  animation: glitch-b 4.7s infinite;
+}
+@keyframes glitch-a {
+  0%,
+  88%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  90% {
+    transform: translate(-2px, 1px);
+    opacity: 0.85;
+  }
+  93% {
+    transform: translate(2px, -1px);
+    opacity: 0.55;
+  }
+}
+@keyframes glitch-b {
+  0%,
+  83%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  86% {
+    transform: translate(2px, -1px);
+    opacity: 0.8;
+  }
+  91% {
+    transform: translate(-2px, 1px);
+    opacity: 0.45;
+  }
+}
+
+/* ---------------------------------------------------------------
+   CAP. 04 · NEÓN DE TORMENTA
+--------------------------------------------------------------- */
+.neon-text {
+  color: #fff;
+  text-shadow:
+    0 0 4px rgba(255, 255, 255, 0.9),
+    0 0 14px var(--neon, #ff2d95),
+    0 0 32px var(--neon, #ff2d95),
+    0 0 64px var(--neon2, #22d3ee);
+}
+
+/* ---------------------------------------------------------------
+   CAP. 05 · HUD DEL TALLER
+--------------------------------------------------------------- */
+.scanlines {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.05) 0 1px,
+    transparent 1px 3px
+  );
+}
+
+.hud-ticks {
+  background-image: repeating-linear-gradient(
+    90deg,
+    currentColor 0 1px,
+    transparent 1px 10px
+  );
+}
+
+.checkers {
+  background-image: repeating-conic-gradient(#fff 0% 25%, transparent 0% 50%);
+  background-size: 22px 22px;
+}
+
+/* ---------------------------------------------------------------
+   MARCOS DE VIÑETA POR ZONA
+--------------------------------------------------------------- */
+.frame-synth {
+  box-shadow:
+    0 0 0 1px rgba(245, 179, 1, 0.55),
+    0 0 45px rgba(245, 179, 1, 0.15),
+    inset 0 0 40px rgba(224, 75, 58, 0.07);
+}
+
+.frame-forged {
+  box-shadow:
+    0 0 0 2px rgba(203, 213, 225, 0.45),
+    0 0 0 9px rgba(2, 6, 23, 0.55),
+    0 0 60px rgba(255, 45, 149, 0.22),
+    0 0 110px rgba(34, 211, 238, 0.16);
+}
+
+.frame-hud {
+  box-shadow:
+    0 0 0 1px rgba(34, 211, 238, 0.4),
+    0 0 50px rgba(34, 211, 238, 0.14),
+    inset 0 0 30px rgba(34, 211, 238, 0.07);
+}
+
+.frame-light {
+  box-shadow:
+    0 0 0 1px rgba(134, 239, 172, 0.85),
+    0 0 0 6px rgba(34, 197, 94, 0.12),
+    0 0 70px rgba(34, 197, 94, 0.32),
+    inset 0 0 50px rgba(34, 197, 94, 0.1);
+}
+
+/* ---------------------------------------------------------------
+   TEXTURAS COMPARTIDAS
 --------------------------------------------------------------- */
 .halftone {
   background-image: radial-gradient(currentColor 1px, transparent 1.5px);
@@ -70,9 +219,6 @@ body {
   background-size: 13px 13px;
 }
 
-/* ---------------------------------------------------------------
-   LÍNEAS DE VELOCIDAD
---------------------------------------------------------------- */
 .speedlines {
   background-image: repeating-linear-gradient(
     90deg,
@@ -91,9 +237,6 @@ body {
   );
 }
 
-/* ---------------------------------------------------------------
-   ESTALLIDO DE RAYOS
---------------------------------------------------------------- */
 .rays {
   background: repeating-conic-gradient(
     from 0deg,
@@ -105,16 +248,7 @@ body {
 }
 
 /* ---------------------------------------------------------------
-   BANDERA A CUADROS (guiño F1 del capítulo 05)
---------------------------------------------------------------- */
-.checkers {
-  background-image: repeating-conic-gradient(#fff 0% 25%, transparent 0% 50%);
-  background-size: 24px 24px;
-}
-
-/* ---------------------------------------------------------------
    TITULARES ESTILO CÓMIC
-   --stroke se puede cambiar por elemento: [--stroke:#0a0a0f]
 --------------------------------------------------------------- */
 .comic-title {
   font-family: var(--font-bangers), Impact, "Arial Black", sans-serif;
@@ -122,16 +256,6 @@ body {
   -webkit-text-stroke: 2px var(--stroke, #100f0d);
   paint-order: stroke fill;
   text-shadow: 5px 5px 0 rgba(0, 0, 0, 0.45);
-}
-
-/* ---------------------------------------------------------------
-   TEXTURA DE PAPEL
---------------------------------------------------------------- */
-.paper-grain {
-  background-image:
-    radial-gradient(circle at 18% 22%, rgba(180, 140, 90, 0.16), transparent 45%),
-    radial-gradient(circle at 82% 72%, rgba(150, 110, 70, 0.14), transparent 50%),
-    radial-gradient(circle at 50% 100%, rgba(120, 90, 60, 0.1), transparent 55%);
 }
 
 /* ---------------------------------------------------------------

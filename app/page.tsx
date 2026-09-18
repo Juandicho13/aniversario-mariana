@@ -4,21 +4,26 @@ import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import {
   Chapter,
   ChapterDots,
-  LanternFx,
   ProgressBar,
   Rays,
-  SpeedLines,
-  SpeedsterFx,
   StarBadge,
-  StarField,
 } from "./components/comic";
+import {
+  ChalkNote,
+  HudFx,
+  LabFx,
+  LanternFx,
+  StormFx,
+  SynthFx,
+} from "./components/effects";
 import { GiftScene } from "./components/gift";
 import { LetterScene } from "./components/letter";
 import { MusicProvider } from "./components/music";
 
-/* Estilo base de los párrafos del cómic */
+/* Tamaño y ritmo de los párrafos. El color lo pone cada viñeta,
+   según la zona en la que esté. */
 const P =
-  "text-[1.05rem] leading-[1.9] text-zinc-200/95 sm:text-xl sm:leading-[1.95] md:text-[1.35rem] text-left md:text-justify hyphens-auto";
+  "text-[1.05rem] leading-[1.9] sm:text-xl sm:leading-[1.95] md:text-[1.35rem] text-left md:text-justify hyphens-auto";
 
 export default function AniversarioCarta() {
   const { scrollYProgress } = useScroll();
@@ -29,18 +34,18 @@ export default function AniversarioCarta() {
     restDelta: 0.001,
   });
 
-  // El fondo viaja del papel de la carta a la tinta del cómic
+  // El fondo viaja del papel de la carta al color de cada zona
   const backgroundColor = useTransform(
     scrollYProgress,
     [0, 0.11, 0.17, 0.3, 0.44, 0.58, 0.72, 0.88, 1],
     [
       "#fdf7f0",
       "#fdf7f0",
-      "#0a0a10",
-      "#140c06",
-      "#06120f",
-      "#08122b",
-      "#04121a",
+      "#0d1a18",
+      "#0d1a18",
+      "#120a08",
+      "#07091c",
+      "#050d14",
       "#03130b",
       "#0a0508",
     ]
@@ -76,14 +81,17 @@ export default function AniversarioCarta() {
         </LetterScene>
 
         {/* ============================================================
-            CAP. 02 — LA CAJA  (velocista)
+            CAP. 02 — LA CAJA
+            Pizarra de física + velocidad
         ============================================================ */}
         <Chapter
           number="02"
           title="La caja"
-          sfx="¡ZAAAP!"
-          accent="#fbbf24"
-          effect={<SpeedsterFx />}
+          label="colapso de la función de onda"
+          theme="chalk"
+          accent="#9fd8ff"
+          effect={<LabFx />}
+          after={<ChalkNote />}
         >
           <p className={`${P} mb-7`}>
             A veces pienso que enamorarse es como ese famoso experimento del gato en la caja: antes
@@ -99,57 +107,15 @@ export default function AniversarioCarta() {
 
         {/* ============================================================
             CAP. 03 — ORDEN Y CAOS
+            Sintético: el caos se ordena
         ============================================================ */}
         <Chapter
           number="03"
           title="Orden y caos"
-          sfx="¡CRACK!"
-          accent="#2dd4bf"
-          effect={
-            <>
-              <motion.div
-                initial={{ opacity: 0, scale: 0.85 }}
-                whileInView={{ opacity: 1, scale: 1.1 }}
-                viewport={{ once: false, amount: 0.3 }}
-                transition={{ duration: 3, repeat: Infinity, repeatType: "reverse" }}
-                className="absolute h-[620px] w-[620px] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.12),transparent_65%)]"
-              />
-              {/* la cicatriz dorada que se dibuja: kintsugi */}
-              <svg
-                viewBox="0 0 400 400"
-                className="absolute h-[78vmin] w-[78vmin] opacity-80"
-                fill="none"
-              >
-                <defs>
-                  <linearGradient id="kintsugi" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#fde68a" />
-                    <stop offset="50%" stopColor="#2dd4bf" />
-                    <stop offset="100%" stopColor="#fbbf24" />
-                  </linearGradient>
-                </defs>
-                <motion.path
-                  d="M198 8 L176 96 L214 138 L168 214 L206 262 L172 334 L192 396"
-                  stroke="url(#kintsugi)"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  whileInView={{ pathLength: 1, opacity: 1 }}
-                  viewport={{ once: false, amount: 0.3 }}
-                  transition={{ duration: 2.4, ease: "easeInOut", delay: 0.3 }}
-                />
-                <motion.path
-                  d="M214 138 L282 118 M168 214 L96 196 M206 262 L276 288"
-                  stroke="url(#kintsugi)"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  whileInView={{ pathLength: 1, opacity: 0.7 }}
-                  viewport={{ once: false, amount: 0.3 }}
-                  transition={{ duration: 2, ease: "easeInOut", delay: 1.1 }}
-                />
-              </svg>
-            </>
-          }
+          label="estado: certeza"
+          theme="synth"
+          accent="#e04b3a"
+          effect={<SynthFx />}
         >
           <p className={`${P} mb-7`}>
             De repente, en medio de este mundo donde solemos creer que el orden y el caos son
@@ -166,36 +132,15 @@ export default function AniversarioCarta() {
 
         {/* ============================================================
             CAP. 04 — EL BAILE
+            Tormenta, puente de luz y medallón
         ============================================================ */}
         <Chapter
           number="04"
           title="El baile"
-          sfx="¡TUM-TUM!"
-          accent="#60a5fa"
-          effect={
-            <>
-              <StarField count={55} className="opacity-70" />
-              <div
-                aria-hidden
-                className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_120%,rgba(96,165,250,0.18),transparent_60%)]"
-              />
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 46, repeat: Infinity, ease: "linear" }}
-                className="absolute h-[min(78vmin,520px)] w-[min(78vmin,520px)] rounded-full border border-dashed border-blue-300/25"
-              />
-              <motion.div
-                animate={{ rotate: -360 }}
-                transition={{ duration: 34, repeat: Infinity, ease: "linear" }}
-                className="absolute h-[min(64vmin,430px)] w-[min(64vmin,430px)] rounded-full border-2 border-white/10"
-              />
-              <motion.div
-                animate={{ scale: [1, 1.06, 1], opacity: [0.25, 0.5, 0.25] }}
-                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute h-[min(44vmin,300px)] w-[min(44vmin,300px)] rounded-full border border-blue-200/20 shadow-[0_0_120px_-20px_rgba(96,165,250,0.6)]"
-              />
-            </>
-          }
+          label="TUM-TUM"
+          theme="forged"
+          accent="#ff2d95"
+          effect={<StormFx />}
         >
           <p className={`${P} mb-7`}>
             Por eso, cuando te conocí, supe de inmediato que había encontrado a la pareja de baile
@@ -214,28 +159,15 @@ export default function AniversarioCarta() {
 
         {/* ============================================================
             CAP. 05 — EL TALLER Y LA PISTA
+            HUD de taller + telemetría
         ============================================================ */}
         <Chapter
           number="05"
           title="El taller y la pista"
-          sfx="¡VROOOM!"
-          accent="#22d3ee"
-          effect={
-            <>
-              <motion.div
-                animate={{ scale: [1, 1.06, 1], opacity: [0.2, 0.4, 0.2] }}
-                transition={{ repeat: Infinity, duration: 2.6, ease: "easeInOut" }}
-                className="absolute h-[min(52vmin,360px)] w-[min(52vmin,360px)] rounded-full border-[3px] border-cyan-300/40 shadow-[0_0_100px_rgba(34,211,238,0.25)]"
-              />
-              <motion.div
-                animate={{ scale: [1, 1.15, 1], opacity: [0.35, 0.1, 0.35] }}
-                transition={{ repeat: Infinity, duration: 2.6, ease: "easeInOut" }}
-                className="absolute h-[min(30vmin,200px)] w-[min(30vmin,200px)] rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.35),transparent_70%)]"
-              />
-              <SpeedLines className="text-cyan-200/25" />
-              <div aria-hidden className="checkers absolute inset-x-0 bottom-0 h-8 opacity-[0.07]" />
-            </>
-          }
+          label="VUELTA 04 · P1"
+          theme="hud"
+          accent="#f5b301"
+          effect={<HudFx />}
         >
           <p className={`${P} mb-7`}>
             Saber que te tengo a mi lado es lo que me impulsa todos los días. Sé que a veces mi mente
@@ -260,12 +192,14 @@ export default function AniversarioCarta() {
         </Chapter>
 
         {/* ============================================================
-            CAP. 06 — EL JURAMENTO  (linterna)
+            CAP. 06 — EL JURAMENTO
+            La linterna, el anillo y la luz
         ============================================================ */}
         <Chapter
           number="06"
           title="El juramento"
-          sfx="¡FIUUU!"
+          label="luz 100%"
+          theme="light"
           accent="#22c55e"
           effect={<LanternFx />}
           after={
@@ -290,13 +224,13 @@ export default function AniversarioCarta() {
             sola constante absoluta: mi sueño no estaría completo si no estás en él.
           </p>
 
-          {/* cartucho de diálogo destacado */}
+          {/* el juramento, iluminado */}
           <motion.p
             initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: false, amount: 0.4 }}
             transition={{ duration: 1, delay: 0.2 }}
-            className="my-10 border-l-[3px] border-emerald-400/70 bg-emerald-400/[0.06] px-5 py-6 text-center text-[1.15rem] font-light italic leading-[1.7] text-white drop-shadow-[0_0_18px_rgba(34,197,94,0.35)] sm:text-2xl md:text-[1.75rem]"
+            className="my-10 border-l-[3px] border-emerald-400/70 bg-emerald-400/[0.07] px-5 py-6 text-center text-[1.15rem] font-light italic leading-[1.7] text-white drop-shadow-[0_0_18px_rgba(34,197,94,0.45)] sm:text-2xl md:text-[1.75rem]"
           >
             &ldquo;Por eso, en el día más brillante, en la noche más oscura, siempre voy a ser tu
             escudo, tu apoyo y tu compañero en cada locura.&rdquo;
