@@ -11,11 +11,13 @@ export default function AniversarioCarta() {
   });
 
   // Transiciones de color de fondo (Aseguramos que termine en negro profundo)
+    // Transiciones de color de fondo (Forzamos a que termine y se mantenga en negro absoluto)
   const backgroundColor = useTransform(
     scrollYProgress,
-    [0, 0.15, 0.4, 0.6, 0.9],
-    ["#fdfbf7", "#050505", "#0a1128", "#020b14", "#050505"]
+    [0, 0.15, 0.4, 0.6, 0.8, 1],
+    ["#fdfbf7", "#050505", "#0a1128", "#020b14", "#000000", "#000000"]
   );
+
 
   return (
     <motion.div
