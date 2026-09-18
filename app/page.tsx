@@ -1,21 +1,22 @@
 "use client";
 
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import type { CSSProperties } from "react";
 import {
   Chapter,
   ChapterDots,
-  Halftone,
-  Panel,
+  LanternFx,
   ProgressBar,
   Rays,
-  ScrollCue,
   SpeedLines,
+  SpeedsterFx,
   StarBadge,
   StarField,
 } from "./components/comic";
+import { GiftScene } from "./components/gift";
+import { LetterScene } from "./components/letter";
+import { MusicProvider } from "./components/music";
 
-/* Estilo base de los párrafos de la carta */
+/* Estilo base de los párrafos del cómic */
 const P =
   "text-[1.05rem] leading-[1.9] text-zinc-200/95 sm:text-xl sm:leading-[1.95] md:text-[1.35rem] text-left md:text-justify hyphens-auto";
 
@@ -28,110 +29,61 @@ export default function AniversarioCarta() {
     restDelta: 0.001,
   });
 
-  // De papel crema (portada) a tinta negra (el resto del cómic)
+  // El fondo viaja del papel de la carta a la tinta del cómic
   const backgroundColor = useTransform(
     scrollYProgress,
-    [0, 0.1, 0.17, 0.34, 0.52, 0.72, 0.9, 1],
-    ["#f7f0e1", "#f7f0e1", "#0a0a10", "#0a1128", "#061019", "#04070d", "#000000", "#000000"]
+    [0, 0.11, 0.17, 0.3, 0.44, 0.58, 0.72, 0.88, 1],
+    [
+      "#fdf7f0",
+      "#fdf7f0",
+      "#0a0a10",
+      "#140c06",
+      "#06120f",
+      "#08122b",
+      "#04121a",
+      "#03130b",
+      "#0a0508",
+    ]
   );
 
   return (
-    <>
+    <MusicProvider>
       <ProgressBar progress={smooth} />
-      <ChapterDots progress={smooth} count={6} />
+      <ChapterDots progress={smooth} count={7} />
 
       {/* Lienzo de fondo que cambia de color con el scroll */}
       <motion.div aria-hidden style={{ backgroundColor }} className="fixed inset-0 z-0" />
 
       <main className="relative z-10 w-full">
         {/* ============================================================
-            PORTADA · CAP. 01 — EL ORIGEN
+            ACTO 1 · LA CARTA
         ============================================================ */}
-        <section
-          style={{ "--accent": "#e0241f" } as CSSProperties}
-          className="relative z-10 flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-4 py-24 text-ink"
-        >
-          <div aria-hidden className="paper-grain absolute inset-0 bg-paper" />
-          <Halftone size="lg" className="text-blood opacity-[0.13]" />
-          <Rays className="h-[130vmin] w-[130vmin] text-blood/15" spin={150} />
-          <div
+        <LetterScene>
+          <p className="font-hand text-[2rem] leading-tight text-[#3f2f2c] sm:text-4xl">
+            Querida Mariana,
+          </p>
+          <p className="mt-6 font-hand text-[1.45rem] leading-8 text-[#4a3a36] sm:text-[1.65rem]">
+            un día cualquiera, en un momento cualquiera... mi universo entero se reescribió.
+          </p>
+          <svg
             aria-hidden
-            className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_42%,rgba(16,15,13,0.3))]"
-          />
-
-          {/* cabecera de portada */}
-          <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between gap-3 px-4 py-4 font-comic text-[10px] uppercase tracking-[0.3em] sm:px-8 sm:text-xs">
-            <span className="border-2 border-ink px-2 py-1">Crónicas de un multiverso</span>
-            <span className="bg-ink px-2 py-1 text-paper">Nº 04 · 2026</span>
-          </div>
-
-          {/* sello de los 4 años */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.4, rotate: -30 }}
-            animate={{ opacity: 1, scale: 1, rotate: -12 }}
-            transition={{ type: "spring", stiffness: 200, damping: 12, delay: 0.9 }}
-            className="absolute right-3 top-20 z-20 sm:right-10 sm:top-24"
+            viewBox="0 0 24 24"
+            className="mt-8 ml-auto h-6 w-6 text-rose-400"
+            fill="currentColor"
           >
-            <StarBadge label="4" sub="años" />
-          </motion.div>
-
-          <div className="relative z-20 flex w-full max-w-3xl flex-col items-center text-center">
-            <motion.h1
-              initial={{ opacity: 0, scale: 0.92, y: 24 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-              className="comic-title text-[clamp(2.3rem,10.5vw,6.5rem)] leading-[0.95] text-blood"
-            >
-              Querida Mariana,
-            </motion.h1>
-
-            <motion.div
-              initial={{ opacity: 0, y: 28 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-10 w-full"
-            >
-              <Panel variant="paper">
-                <p className="text-center text-[1.1rem] leading-[1.85] sm:text-2xl">
-                  un día cualquiera, en un momento cualquiera... mi universo entero se reescribió.
-                </p>
-              </Panel>
-            </motion.div>
-          </div>
-
-          <ScrollCue />
-        </section>
+            <path d="M12 21s-7.5-4.7-9.6-9A5.2 5.2 0 0 1 12 6.5 5.2 5.2 0 0 1 21.6 12c-2.1 4.3-9.6 9-9.6 9Z" />
+          </svg>
+        </LetterScene>
 
         {/* ============================================================
-            CAP. 02 — LA CAJA
+            CAP. 02 — LA CAJA  (velocista)
         ============================================================ */}
         <Chapter
           number="02"
           title="La caja"
           sfx="¡ZAAAP!"
-          accent="#ffd60a"
-          effect={
-            <>
-              <StarField count={40} className="opacity-50" />
-              {/* destello que cruza la pantalla */}
-              <motion.div
-                initial={{ opacity: 0, x: "-110%" }}
-                whileInView={{ opacity: [0, 1, 0], x: "110%" }}
-                viewport={{ once: false, amount: 0.35 }}
-                transition={{ duration: 0.7, ease: "easeOut", delay: 0.4 }}
-                className="absolute left-0 top-1/2 h-[3px] w-full bg-yellow-300 shadow-[0_0_60px_14px_rgba(250,204,21,0.55)]"
-              />
-              {/* fogonazo */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: [0, 0.3, 0] }}
-                viewport={{ once: false, amount: 0.35 }}
-                transition={{ duration: 0.6, delay: 0.45 }}
-                className="absolute inset-0 bg-yellow-200"
-              />
-              <SpeedLines className="text-yellow-200/25" />
-            </>
-          }
+          accent="#fbbf24"
+          effect={<SpeedsterFx />}
         >
           <p className={`${P} mb-7`}>
             A veces pienso que enamorarse es como ese famoso experimento del gato en la caja: antes
@@ -223,7 +175,6 @@ export default function AniversarioCarta() {
           effect={
             <>
               <StarField count={55} className="opacity-70" />
-              {/* arco de luz cruzando mundos */}
               <div
                 aria-hidden
                 className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_120%,rgba(96,165,250,0.18),transparent_60%)]"
@@ -309,34 +260,14 @@ export default function AniversarioCarta() {
         </Chapter>
 
         {/* ============================================================
-            CAP. 06 — EL JURAMENTO
+            CAP. 06 — EL JURAMENTO  (linterna)
         ============================================================ */}
         <Chapter
           number="06"
           title="El juramento"
           sfx="¡FIUUU!"
           accent="#22c55e"
-          effect={
-            <>
-              <StarField count={70} />
-              <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                viewport={{ once: false, amount: 0.3 }}
-                transition={{ duration: 2.5 }}
-                className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.18),transparent_62%)]"
-              />
-              <Rays className="h-[120vmin] w-[120vmin] text-emerald-300/10" spin={180} />
-              {/* estrella fugaz */}
-              <motion.div
-                initial={{ opacity: 0, y: -240, x: 240 }}
-                whileInView={{ opacity: [0, 1, 0], y: 320, x: -320 }}
-                viewport={{ once: false, amount: 0.3 }}
-                transition={{ duration: 2.2, delay: 1, ease: "easeOut" }}
-                className="absolute right-1/4 top-0 h-1 w-1 rounded-full bg-white shadow-[0_0_30px_10px_rgba(255,255,255,0.8)]"
-              />
-            </>
-          }
+          effect={<LanternFx />}
           after={
             <div className="relative mt-20 flex w-full flex-col items-center text-center">
               <div className="relative flex w-full items-center justify-center py-6">
@@ -351,14 +282,6 @@ export default function AniversarioCarta() {
                   Feliz aniversario.
                 </motion.p>
               </div>
-
-              <p className="mt-6 font-comic text-sm uppercase tracking-[0.45em] text-white/55 sm:text-base">
-                ATT : juan 2026
-              </p>
-
-              <p className="mt-14 font-comic text-[10px] uppercase tracking-[0.4em] text-white/25">
-                Continuará… en el año 5
-              </p>
             </div>
           }
         >
@@ -384,7 +307,29 @@ export default function AniversarioCarta() {
             es todo lo que puedo desear.
           </p>
         </Chapter>
+
+        {/* ============================================================
+            ACTO FINAL · EL REGALO
+        ============================================================ */}
+        <GiftScene
+          songTitle="Mi Vida Entera"
+          songArtist="Morat"
+          signature={
+            <div className="flex flex-col items-center gap-6 text-center">
+              <StarBadge label="4" sub="años" />
+              <p className="font-comic text-sm uppercase tracking-[0.45em] text-white/55">
+                ATT : juan 2026
+              </p>
+              <p className="font-comic text-[10px] uppercase tracking-[0.4em] text-white/25">
+                Continuará… en el año 5
+              </p>
+            </div>
+          }
+        >
+          {/* 👇 cambia esta línea por la tuya */}
+          Ponle play, mi amor. Esta canción dice lo que a mí me faltan palabras para decir.
+        </GiftScene>
       </main>
-    </>
+    </MusicProvider>
   );
 }

@@ -135,15 +135,7 @@ export function Panel({
   );
 }
 
-export function ChapterTag({
-  number,
-  title,
-  variant = "ink",
-}: {
-  number: string;
-  title: string;
-  variant?: "ink" | "paper";
-}) {
+export function ChapterTag({ number, title }: { number: string; title: string }) {
   return (
     <div className="mb-5 flex flex-wrap items-center gap-3">
       <span
@@ -152,12 +144,7 @@ export function ChapterTag({
       >
         CAP. {number}
       </span>
-      <span
-        className={clsx(
-          "font-comic text-xs uppercase tracking-[0.35em] sm:text-sm",
-          variant === "paper" ? "text-ink/70" : "text-white/55"
-        )}
-      >
+      <span className="font-comic text-xs uppercase tracking-[0.35em] text-white/55 sm:text-sm">
         {title}
       </span>
     </div>
@@ -199,17 +186,226 @@ export function StarBadge({
   }).join(" ");
 
   return (
-    <div className={clsx("relative h-24 w-24 sm:h-32 sm:w-32", className)}>
+    <div className={clsx("relative h-24 w-24 sm:h-28 sm:w-28", className)}>
       <svg viewBox="0 0 100 100" className="h-full w-full drop-shadow-[3px_4px_0_rgba(16,15,13,0.85)]">
         <polygon points={points} fill="var(--accent)" stroke="#100f0d" strokeWidth="2.5" />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center font-comic leading-none text-paper">
-        <span className="text-2xl sm:text-4xl">{label}</span>
+      <div className="absolute inset-0 flex flex-col items-center justify-center font-comic leading-none text-ink">
+        <span className="text-2xl sm:text-3xl">{label}</span>
         {sub ? (
-          <span className="mt-0.5 text-[9px] uppercase tracking-[0.22em] sm:text-xs">{sub}</span>
+          <span className="mt-0.5 text-[9px] uppercase tracking-[0.22em] sm:text-[11px]">{sub}</span>
         ) : null}
       </div>
     </div>
+  );
+}
+
+/* ===============================================================
+   EFECTO VELOCISTA (diseño propio)
+   Estelas con eco, arcos eléctricos y un emblema de rombo + rayo
+   dibujado desde cero.
+=============================================================== */
+
+const BOLTS = [
+  "M120 20 L96 92 L132 86 L104 168",
+  "M470 40 L500 104 L466 106 L494 178",
+  "M300 8 L272 70 L306 66 L286 128",
+];
+
+export function SpeedsterFx() {
+  return (
+    <>
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(251,191,36,0.12),transparent_62%)]"
+      />
+
+      {/* emblema propio: rombo con rayo */}
+      <motion.svg
+        viewBox="0 0 120 120"
+        className="absolute h-[38vmin] w-[38vmin] max-h-[320px] max-w-[320px] opacity-[0.18]"
+        animate={{ scale: [1, 1.06, 1] }}
+        transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <path d="M60 4 L114 60 L60 116 L6 60 Z" fill="none" stroke="#fbbf24" strokeWidth="3" />
+        <path d="M60 10 L108 60 L60 110 L12 60 Z" fill="none" stroke="#f87171" strokeWidth="1" />
+        <path d="M68 26 L38 64 L57 64 L49 96 L84 56 L63 56 Z" fill="#fbbf24" />
+      </motion.svg>
+
+      {/* estelas con eco */}
+      {[0, 0.11, 0.22].map((delay, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, x: "-120%" }}
+          whileInView={{ opacity: [0, 1, 0], x: "120%" }}
+          viewport={{ once: false, amount: 0.35 }}
+          transition={{ duration: 0.8, delay: 0.35 + delay, ease: "easeOut" }}
+          className="absolute left-0 h-[2px] w-full"
+          style={{
+            top: `${45 + i * 4}%`,
+            background: i === 0 ? "#fde68a" : "#f87171",
+            boxShadow:
+              i === 0
+                ? "0 0 55px 12px rgba(253,230,138,0.5)"
+                : "0 0 40px 8px rgba(248,113,113,0.3)",
+          }}
+        />
+      ))}
+
+      {/* arcos eléctricos */}
+      <svg
+        viewBox="0 0 600 200"
+        className="absolute h-[70vmin] w-[92vmin] opacity-70"
+        fill="none"
+      >
+        {BOLTS.map((d, i) => (
+          <motion.path
+            key={i}
+            d={d}
+            stroke={i === 1 ? "#f87171" : "#fde68a"}
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            initial={{ pathLength: 0, opacity: 0 }}
+            whileInView={{ pathLength: [0, 1, 1], opacity: [0, 1, 0] }}
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{
+              duration: 1.2,
+              delay: 0.6 + i * 0.28,
+              repeat: Infinity,
+              repeatDelay: 2.4,
+              ease: "easeOut",
+            }}
+          />
+        ))}
+      </svg>
+
+      <SpeedLines className="text-amber-200/25" />
+    </>
+  );
+}
+
+/* ===============================================================
+   EFECTO LINTERNA (diseño propio)
+   Farol hexagonal con núcleo de luz, anillo que se dibuja y
+   partículas subiendo. Todo dibujado desde cero.
+=============================================================== */
+
+const MOTES = Array.from({ length: 16 }, (_, i) => {
+  const a = Math.abs(Math.sin((i + 1) * 9.13) * 3571.11) % 1;
+  const b = Math.abs(Math.sin((i + 1) * 5.77) * 1597.31) % 1;
+  return {
+    left: `${(24 + a * 52).toFixed(2)}%`,
+    size: Number((2 + b * 3).toFixed(2)),
+    delay: Number((a * 6).toFixed(2)),
+    dur: Number((6 + b * 5).toFixed(2)),
+    drift: Math.round((a - 0.5) * 60),
+  };
+});
+
+export function LanternFx() {
+  const reduce = useReducedMotion();
+  return (
+    <>
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-[radial-gradient(circle_at_50%_52%,rgba(34,197,94,0.22),transparent_62%)]"
+      />
+      <StarField count={55} className="opacity-70" />
+      <Rays className="h-[130vmin] w-[130vmin] text-emerald-300/10" spin={200} />
+
+      {/* anillos */}
+      <svg viewBox="0 0 200 200" className="absolute h-[76vmin] w-[76vmin]" fill="none">
+        <motion.circle
+          cx="100"
+          cy="100"
+          r="78"
+          stroke="#4ade80"
+          strokeWidth="1"
+          strokeDasharray="3 7"
+          opacity="0.5"
+          style={{ transformOrigin: "100px 100px" }}
+          animate={reduce ? undefined : { rotate: 360 }}
+          transition={{ duration: 70, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.circle
+          cx="100"
+          cy="100"
+          r="62"
+          stroke="#22c55e"
+          strokeWidth="2"
+          initial={{ pathLength: 0, opacity: 0 }}
+          whileInView={{ pathLength: 1, opacity: 0.85 }}
+          viewport={{ once: false, amount: 0.3 }}
+          transition={{ duration: 2.4, ease: "easeInOut", delay: 0.3 }}
+        />
+      </svg>
+
+      {/* el farol */}
+      <motion.svg
+        viewBox="0 0 120 180"
+        className="absolute h-[44vmin] max-h-[330px]"
+        animate={reduce ? undefined : { y: [0, -12, 0] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <defs>
+          <radialGradient id="lanternCore" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#f0fff5" />
+            <stop offset="42%" stopColor="#4ade80" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#14532d" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+
+        {/* resplandor */}
+        <motion.ellipse
+          cx="60"
+          cy="96"
+          rx="52"
+          ry="58"
+          fill="url(#lanternCore)"
+          animate={reduce ? undefined : { opacity: [0.55, 1, 0.55] }}
+          transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        <g stroke="#08361f" strokeWidth="3" strokeLinejoin="round">
+          {/* asa */}
+          <path d="M38 32 a22 20 0 0 1 44 0" fill="none" />
+          {/* tapa */}
+          <polygon points="60,34 94,52 94,60 26,60 26,52" fill="#1f7a4d" />
+          {/* cuerpo */}
+          <path d="M31 60 L89 60 L84 134 L36 134 Z" fill="#0f5132" fillOpacity="0.85" />
+          {/* base */}
+          <polygon points="26,134 94,134 99,152 21,152" fill="#1f7a4d" />
+        </g>
+
+        {/* núcleo de luz */}
+        <motion.path
+          d="M60 72 C76 92 71 112 60 122 C49 112 44 92 60 72 Z"
+          fill="#dcfce7"
+          animate={reduce ? undefined : { opacity: [0.75, 1, 0.75], scale: [1, 1.05, 1] }}
+          style={{ transformOrigin: "60px 97px" }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+        />
+        {/* barrotes del farol */}
+        <path d="M46 60 L44 134 M74 60 L76 134" stroke="#08361f" strokeWidth="2.5" />
+      </motion.svg>
+
+      {/* partículas de luz subiendo */}
+      {!reduce && (
+        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+          {MOTES.map((m, i) => (
+            <motion.span
+              key={i}
+              style={{ left: m.left, width: m.size, height: m.size }}
+              className="absolute bottom-1/4 rounded-full bg-emerald-200 shadow-[0_0_10px_2px_rgba(74,222,128,0.6)]"
+              initial={{ y: 0, opacity: 0 }}
+              animate={{ y: -320, x: m.drift, opacity: [0, 0.9, 0] }}
+              transition={{ duration: m.dur, delay: m.delay, repeat: Infinity, ease: "easeOut" }}
+            />
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -249,7 +445,7 @@ function Dot({
 
 export function ChapterDots({
   progress,
-  count = 6,
+  count = 7,
 }: {
   progress: MotionValue<number>;
   count?: number;
@@ -263,28 +459,6 @@ export function ChapterDots({
         <Dot key={i} index={i} count={count} progress={progress} />
       ))}
     </div>
-  );
-}
-
-export function ScrollCue({ label = "desliza" }: { label?: string }) {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      aria-hidden
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 1.6, duration: 1 }}
-      className="absolute bottom-8 left-1/2 z-20 -translate-x-1/2"
-    >
-      <motion.div
-        animate={reduce ? undefined : { y: [0, 9, 0] }}
-        transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-        className="flex flex-col items-center gap-2 font-comic text-[10px] uppercase tracking-[0.4em] text-ink/60"
-      >
-        {label}
-        <span className="block h-6 w-[2px] bg-ink/40" />
-      </motion.div>
-    </motion.div>
   );
 }
 

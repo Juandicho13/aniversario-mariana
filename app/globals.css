@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------
-   TOKENS DEL CÓMIC
+   TOKENS
 --------------------------------------------------------------- */
 @theme {
   --color-ink: #100f0d;
@@ -10,10 +10,11 @@
 
   --font-comic: var(--font-bangers);
   --font-letter: var(--font-playfair);
+  --font-hand: var(--font-caveat);
 }
 
 :root {
-  /* color de acento del capítulo actual (lo sobreescribe cada <Chapter />) */
+  /* color de acento de la escena actual (lo sobreescribe cada sección) */
   --accent: #ffd60a;
   color-scheme: dark;
 }
@@ -33,6 +34,27 @@ body {
 ::selection {
   background: var(--accent);
   color: #100f0d;
+}
+
+/* ---------------------------------------------------------------
+   ACTO 1 · LA CARTA
+--------------------------------------------------------------- */
+.letter-paper {
+  background-color: #fffdf6;
+  background-image: repeating-linear-gradient(
+    180deg,
+    transparent 0 31px,
+    rgba(120, 130, 160, 0.13) 31px 32px
+  );
+}
+
+.tape {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.6),
+    rgba(255, 255, 255, 0.22)
+  );
+  box-shadow: 0 1px 5px rgba(90, 60, 50, 0.18);
 }
 
 /* ---------------------------------------------------------------
@@ -70,7 +92,7 @@ body {
 }
 
 /* ---------------------------------------------------------------
-   ESTALLIDO DE RAYOS (fondo de portada y del cierre)
+   ESTALLIDO DE RAYOS
 --------------------------------------------------------------- */
 .rays {
   background: repeating-conic-gradient(
@@ -103,7 +125,7 @@ body {
 }
 
 /* ---------------------------------------------------------------
-   TEXTURA DE PAPEL VIEJO (portada)
+   TEXTURA DE PAPEL
 --------------------------------------------------------------- */
 .paper-grain {
   background-image:
