@@ -11,7 +11,7 @@ export default function AniversarioCarta() {
   });
 
   // Transiciones de color de fondo según el scroll
-  // 0% -> Papel (Crema) | 20% -> Espacio (Negro) | 40% -> Azul Medianoche | 60% -> Taller (Azul oscuro tecnológico) | 80% -> Negro profundo
+  // 0% -> Papel (Crema) | 20% -> Espacio (Negro) | 40% -> Azul Medianoche | 60% -> Taller (Azul oscuro tecnológico) | 80% -> Negro profundos
   const backgroundColor = useTransform(
     scrollYProgress,
     [0, 0.15, 0.4, 0.6, 0.85],
